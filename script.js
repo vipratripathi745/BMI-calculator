@@ -14,26 +14,38 @@ button.addEventListener("click", () => {
         return;
     }
 
-    // Weight conversion
+    // weight conversion
     if (weightUnit === "lb") {
         weight = weight * 0.453592;
     }
 
     let heightInMeters;
 
-    // Height conversion
+    // CASE 1: cm
     if (heightUnit === "cm") {
         heightInMeters = height / 100;
-    } 
+    }
+
+    // CASE 2: ft.in format (5.11, 5.9, 5.10 etc)
     else if (heightUnit === "ftin") {
+
         let feet = Math.floor(height);
-        let inches = Math.round((height - feet) * 100);
+
+        // convert decimal part safely as string
+        let decimalPart = height.toString().split(".")[1] || "0";
+
+        let inches = parseInt(decimalPart);
+
+        // FIX: handle 5.9 → 9 inches (NOT 90)
+        if (decimalPart.length === 1) {
+            inches = inches; // 5.9 = 5 ft 9 in
+        }
 
         let totalInches = (feet * 12) + inches;
         heightInMeters = totalInches * 0.0254;
     }
 
-    const bmi = weight / (heightInMeters * heightInMeters);
+    let bmi = weight / (heightInMeters * heightInMeters);
 
     let category = "";
 
