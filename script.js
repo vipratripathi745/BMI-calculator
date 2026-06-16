@@ -1,61 +1,32 @@
-const button = document.getElementById("calculate-btn");
-const result = document.getElementById("result");
+let heightInput = document.getElementById("height").value;
 
-button.addEventListener("click", () => {
+// convert to string (IMPORTANT)
+heightInput = heightInput.toString();
 
-    let weight = parseFloat(document.getElementById("weight").value);
-    const weightUnit = document.getElementById("weightUnit").value;
+let feet = 0;
+let inches = 0;
 
-    let height = parseFloat(document.getElementById("height").value);
-    const heightUnit = document.getElementById("heightUnit").value;
+// split at decimal
+if (heightInput.includes(".")) {
+    let parts = heightInput.split(".");
 
-    if (isNaN(weight) || weight <= 0 || isNaN(height) || height <= 0) {
-        result.innerHTML = "Please enter valid values.";
-        return;
+    feet = parseInt(parts[0]);
+    inches = parseInt(parts[1]); // IMPORTANT FIX
+
+    // handle edge case: "5.9" = 5 ft 9 in
+    // "5.10" = 5 ft 10 in (NOT 100)
+    if (parts[1].length === 1) {
+        inches = parseInt(parts[1]);
     }
-
-    // weight conversion
-    if (weightUnit === "lb") {
-        weight = weight * 0.453592;
+    else if (parts[1].length === 2) {
+        inches = parseInt(parts[1]);
     }
+}
+else {
+    feet = parseInt(heightInput);
+    inches = 0;
+}
 
-    let heightInMeters;
-
-    // CASE 1: cm
-    if (heightUnit === "cm") {
-        heightInMeters = height / 100;
-    }
-
-    // CASE 2: ft.in format (5.11, 5.9, 5.10 etc)
-    else if (heightUnit === "ftin") {
-
-        let feet = Math.floor(height);
-
-        // convert decimal part safely as string
-        let decimalPart = height.toString().split(".")[1] || "0";
-
-        let inches = parseInt(decimalPart);
-
-        // FIX: handle 5.9 → 9 inches (NOT 90)
-        if (decimalPart.length === 1) {
-            inches = inches; // 5.9 = 5 ft 9 in
-        }
-
-        let totalInches = (feet * 12) + inches;
-        heightInMeters = totalInches * 0.0254;
-    }
-
-    let bmi = weight / (heightInMeters * heightInMeters);
-
-    let category = "";
-
-    if (bmi < 18.5) category = "Underweight";
-    else if (bmi < 25) category = "Normal";
-    else if (bmi < 30) category = "Overweight";
-    else category = "Obese";
-
-    result.innerHTML = `
-        BMI: <strong>${bmi.toFixed(2)}</strong><br>
-        Category: <strong>${category}</strong>
-    `;
-});
+// convert to meters
+let totalInches = (feet * 12) + inches;
+let heightInMeters = totalInches * 0.0254;
